@@ -1,3 +1,11 @@
+/* Bubble Counter project - This project is meant to measure the bubbles through a water-lock in a fermenter
+ *  It should indicate what the current fermentation rate is and the rate relative to the past.
+ *  It countains a data-logging shield to store the time stamps of the bubble.
+ *  An LCD screen is added to allow for read-out during the measurment.
+ *  E.Milacic
+ */
+
+/*=============================================== Libraries ==========================================*/
 // LCD library
 #include <LiquidCrystal.h>
 
@@ -8,9 +16,16 @@
 // CRealTimeClock library
 #include <RTClib.h>
 
+/*======================================== Home made extensions =======================================*/
+#include "SDCard.h"
+#include "BubbleDataObject.h"
+
+
+/*=============================================== Globals ==============================================*/
+
 //Set up all the components
 //LCD screen
-const int ButtonPin = 0, LCDLight = 10;
+const int ButtonPin = A0;
 const int rs = 8, en = 9, d4 = 4, d5 = 5, d6 = 6, d7 = 7;
 LiquidCrystal LCD(rs, en, d4, d5, d6, d7);
 
@@ -19,6 +34,10 @@ Sd2Card card;
 SdVolume volume;
 SdFile root;
 const int chipSelect = 10;
+const int testCard = 1;
+const int hasCard = 1;
+SDCard sdcard(chipSelect);
+
 
 //RealTimeClock
 RTC_DS1307 RTC;
@@ -30,18 +49,16 @@ void setup() {
     ; // wait for serial port to connect. Needed for native USB port only
   }
 
-  Serial.print("\nInitializing SD card...");
-  if (!card.init(SPI_HALF_SPEED, chipSelect)) {
-    Serial.println("initialization failed. Things to check:");
-    Serial.println("* is a card inserted?");
-    Serial.println("* is your wiring correct?");
-    Serial.println("* did you change the chipSelect pin to match your shield or module?");
-    while (1);
-  } else {
-    Serial.println("Wiring is correct and a card is present.");
+if(hasCard){
+  //Start the SD card
+  if(!sdcard.init()){
+    while(1);
   }
-
-  
+  // Test the SD card
+  if(testCard){
+    sdcard.test();
+  }
+}
   //Start the clock
   Wire.begin();
   if(!RTC.begin()){
@@ -71,7 +88,6 @@ Serial.print(":");
 Serial.print(now.second(),DEC);
 Serial.println(" ");
 delay(1000);
-
 int ButtonVal;
 ButtonVal = analogRead(ButtonPin);
 LCD.setCursor(0,0);
