@@ -3,6 +3,9 @@
  * E.Milacic
  */
 
+#ifndef BubbleDataObject_h
+#define BubbleDataObject_h
+
 #include "Arduino.h"
 #include <RTClib.h>
 
@@ -25,6 +28,13 @@ private:
 public:
 	BubbleDataObject(void);
 
+  	//Setters
+	void setStartTime(DateTime start);
+  	void setBubblesPerDay(int newBubsPerDay);
+  	void setBubblesPerHour(int newBubsPerHour);
+  	void setBubblesPerMin(int newBubsPerMin);
+  
+  	//Getters
 	int calculatePercentFromOldDay(void);
 	int calculatePercentFromOldHour(void);
 	int calculatePercentFromOldMin(void);
@@ -36,3 +46,5 @@ public:
 	DateTime calculateRunTime(DateTime now);
 
 };
+
+#endif
