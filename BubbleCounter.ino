@@ -1,7 +1,8 @@
 /* Bubble Counter project - This project is meant to measure the bubbles through a water-lock in a fermenter
  *  It should indicate what the current fermentation rate is and the rate relative to the past.
  *  It countains a data-logging shield to store the time stamps of the bubble.
- *  An LCD screen is added to allow for read-out during the measurment.
+ *  An LCD keypad schield is added to allow for read-out during the measurment.
+ *  There is a conflict in my boards on the D10 pin. So i snipped the D10 pin of the LCD keypad shield.
  *  E.Milacic
  */
 
@@ -13,7 +14,7 @@
 #include <SPI.h>
 #include <SD.h>
 
-// CRealTimeClock library
+//RealTimeClock library
 #include <RTClib.h>
 
 /*======================================== Home made extensions =======================================*/
@@ -38,9 +39,12 @@ const int testCard = 1;
 const int hasCard = 1;
 SDCard sdcard(chipSelect);
 
-
 //RealTimeClock
 RTC_DS1307 RTC;
+
+BubbleDataObject bubbles;
+
+
 
 void setup() {
   //Start the serial to help with debugging
@@ -69,53 +73,16 @@ if(hasCard){
 
   //This starts the LCD screen with the right dimensions
   LCD.begin(16,2);
+
+  bubbles.setStartTime(RTC.now());
 }
 
 void loop() {
-DateTime now = RTC.now();
-Serial.println("The date is now:");
-Serial.print(now.year(),DEC);
-Serial.print("/");
-Serial.print(now.month(),DEC);
-Serial.print("/");
-Serial.print(now.day(),DEC);
-Serial.println(" ");
-Serial.println("The time is now:");
-Serial.print(now.hour(),DEC);
-Serial.print(":");
-Serial.print(now.minute(),DEC);
-Serial.print(":");
-Serial.print(now.second(),DEC);
-Serial.println(" ");
+DateTime now = bubbles.calculateRunTime(RTC.now());
 delay(1000);
-int ButtonVal;
-ButtonVal = analogRead(ButtonPin);
+
 LCD.setCursor(0,0);
 LCD.clear();
-if(ButtonVal< 60){
-  LCD.print("Right ");
-}
-  else if(ButtonVal < 200){
-    LCD.print("Up    ");
-  }
- else if (ButtonVal < 400){
-   LCD.print ("Down  ");
- }
- else if (ButtonVal < 600){
-   LCD.print ("Left  ");
- }
- else if (ButtonVal < 800){
-   LCD.print ("Select");
- }
-else if(ButtonVal > 800){
-   LCD.print ("The time is now:");
-   LCD.setCursor(0,1);
-   LCD.print(now.hour(),DEC);
-   LCD.print(":");
-   LCD.print(now.minute(),DEC);
-   LCD.print(":");
-   LCD.print(now.second(),DEC);
-   
-}
+
   
 }
