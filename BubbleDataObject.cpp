@@ -6,59 +6,59 @@
 #include "Arduino.h"
 #include "BubbleDataObject.h"
 
-BubbleDataObject::BubbleDataObject(void){
-    bubblesPerDay = 0;
-    bubblesPerHour = 0;
-    bubblesPerMin = 0;
-    
-    old_bubblesPerDay = 0;
-    old_bubblesPerHour = 0;
-    old_bubblesPerMin = 0;
 
-    maxBubblesPerDay = 0;
-    maxBubblesPerHour = 0;
-    maxBubblesPerMin = 0;
-}
+BubbleDataObject::BubbleDataObject(void){};
 
 void BubbleDataObject::setStartTime(DateTime start){
     startOfMeasurement = start;
 }
 
+void BubbleDataObject::setTimedVariable(TimedVariable type, T newValue){
+    switch(type){
+        case DAY:{
+            bubblesPerDay.updateValues(newValue);
+            break;
+        }
+        case HOUR:{
+            bubblesPerHour.updateValues(newValue);
+            break;
+        }
+        case MIN:{
+            bubblesPerMin.updateValues(newValue);
+            break;
+        }
+    }
+}
+
 void BubbleDataObject::setBubblesPerDay(int newBubsPerDay){
-  old_bubblesPerDay = bubblesPerDay;
-  bubblesPerDay = newBubsPerDay;
-  maxBubblesPerDay = (maxBubblesPerDay < newBubsPerDay)?newBubsPerDay:maxBubblesPerDay;
+  bubblesPerDay.updateValues(newBubsPerDay);
 }
 
 void BubbleDataObject::setBubblesPerHour(int newBubsPerHour){
-  old_bubblesPerHour = bubblesPerHour;
-  bubblesPerHour = newBubsPerHour;
-  maxBubblesPerHour = (maxBubblesPerHour < newBubsPerHour)?newBubsPerHour:maxBubblesPerHour;
+  bubblesPerHour.updateValues(newBubsPerHour);
 }
 
 void BubbleDataObject::setBubblesPerMin(int newBubsPerMin){
-  old_bubblesPerMin = bubblesPerMin;
-  bubblesPerMin = newBubsPerMin;
-  maxBubblesPerMin = (maxBubblesPerMin < newBubsPerMin)?newBubsPerMin:maxBubblesPerMin;
+  bubblesPerMin.updateValues(newBubsPerMin);
 }
 
 int BubbleDataObject::calculatePercentFromOldDay(void){
-    double percent = (bubblesPerDay/old_bubblesPerDay)*100;
+    double percent = (bubblesPerDay.getCurrent()/bubblesPerDay.getOld())*100;
     return (int)percent;
 }
 
 int BubbleDataObject::calculatePercentFromOldHour(void){
-    double percent = (bubblesPerHour/old_bubblesPerHour)*100;
+    double percent = (bubblesPerHour.getCurrent()/bubblesPerHour.getOld())*100;
     return (int)percent;
 }
 
 int BubbleDataObject::calculatePercentFromOldMin(void){
-    double percent = (bubblesPerMin/old_bubblesPerMin)*100;
+    double percent = (bubblesPerMin.getCurrent()/bubblesPerMin.getOld())*100;
     return (int)percent;
 }
 
 int BubbleDataObject::calculatePercentFromMaxDay(void){
-    double percent = (bubblesPerDay/maxBubblesPerDay)*100;
+    double percent = (bubblesPerDay.getCurrent()/bubblesPerDay.getMax())*100;
     return (int)percent;
 }
 
