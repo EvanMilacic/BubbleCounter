@@ -9,4 +9,6 @@
 
 enum class KeypadButtons{UP; DOWN; RIGHT; LEFT; SELECT; NONE};
 
+enum class TimedVariables{DAY; HOUR; MIN};
+
 #endif
